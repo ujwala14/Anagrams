@@ -42,7 +42,8 @@ import java.util.List;
 
 public class AnagramsActivity extends AppCompatActivity {
 
-    public static final String START_MESSAGE = "Find as many words as possible that can be formed by adding one letter to <big>%s</big> (but that do not contain the substring %s).";
+    public static final String START_MESSAGE = "Find as many words as possible that can be formed by " +
+            "adding one letter to <big>%s</big> (but that do not contain the substring %s).";
     private AnagramDictionary dictionary;
     private String currentWord;
     private List<String> anagrams;
@@ -51,18 +52,19 @@ public class AnagramsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_anagrams);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         AssetManager assetManager = getAssets();
         try {
             InputStream inputStream = assetManager.open("words.txt");
             dictionary = new AnagramDictionary(new InputStreamReader(inputStream));
         } catch (IOException e) {
-            Toast toast = Toast.makeText(this, "Could not load dictionary", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, "Could not load dictionary",
+                    Toast.LENGTH_LONG);
             toast.show();
         }
         // Set up the EditText box to process the content of the box when the user hits 'enter'
-        final EditText editText = (EditText) findViewById(R.id.editText);
+        final EditText editText = findViewById(R.id.editText);
         editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
         editText.setImeOptions(EditorInfo.IME_ACTION_GO);
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -70,7 +72,8 @@ public class AnagramsActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_GO || (
-                        actionId == EditorInfo.IME_NULL && event != null && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                        actionId == EditorInfo.IME_NULL && event != null && event.getAction()
+                                == KeyEvent.ACTION_DOWN)) {
                     processWord(editText);
                     handled = true;
                 }
@@ -80,7 +83,7 @@ public class AnagramsActivity extends AppCompatActivity {
     }
 
     private void processWord(EditText editText) {
-        TextView resultView = (TextView) findViewById(R.id.resultView);
+        TextView resultView = findViewById(R.id.resultView);
         String word = editText.getText().toString().trim().toLowerCase();
         if (word.length() == 0) {
             return;
@@ -121,21 +124,23 @@ public class AnagramsActivity extends AppCompatActivity {
     }
 
     public boolean defaultAction(View view) {
-        TextView gameStatus = (TextView) findViewById(R.id.gameStatusView);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        EditText editText = (EditText) findViewById(R.id.editText);
-        TextView resultView = (TextView) findViewById(R.id.resultView);
+        TextView gameStatus = findViewById(R.id.gameStatusView);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        EditText editText = findViewById(R.id.editText);
+        TextView resultView = findViewById(R.id.resultView);
         if (currentWord == null) {
             currentWord = dictionary.pickGoodStarterWord();
-            anagrams = dictionary.getAnagrams(currentWord);
-            gameStatus.setText(Html.fromHtml(String.format(START_MESSAGE, currentWord.toUpperCase(), currentWord)));
+            anagrams = dictionary.getAnagramsWithOneMoreLetter(currentWord);
+            gameStatus.setText(Html.fromHtml(String.format(START_MESSAGE,
+                    currentWord.toUpperCase(), currentWord)));
             fab.setImageResource(android.R.drawable.ic_menu_help);
             fab.hide();
             resultView.setText("");
             editText.setText("");
             editText.setEnabled(true);
             editText.requestFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
         } else {
             editText.setText(currentWord);
